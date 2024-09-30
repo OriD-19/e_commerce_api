@@ -4,17 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"orid19.com/ecommerce/api/database"
 	"orid19.com/ecommerce/api/types"
 )
-
-type ApiHandler struct {
-	dbStore database.Store
-}
-
-func NewApiHandler(dbStore database.Store) ApiHandler {
-	return ApiHandler{dbStore: dbStore}
-}
 
 func (api ApiHandler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	// parse the request body

@@ -23,14 +23,16 @@ func SetRoutes(app *app.App) *chi.Mux {
 
 	// Add your routes here
 	r.Use(chiddleware.Logger)
+
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.JWTAuthenticationMiddleware)
-		// TODO Implement all the product methods
-		// r.Route("/products", func(r chi.Router) {
-		// 	r.Get("/", app.ApiHandler.GetProductsHandler)
-		// 	r.Post("/", app.ApiHandler.CreateProductHandler)
-		// 	r.Get("/{id}", app.ApiHandler.GetProductHandler)
-		// })
+
+		// // TODO Implement all the product methods
+		r.Route("/products", func(r chi.Router) {
+			r.Get("/", app.ApiHandler.GetProductsHandler)
+			r.Post("/", app.ApiHandler.InsertProductHandler)
+			r.Get("/{id}", app.ApiHandler.GetProductHandler)
+		})
 
 		r.Get("/protected", app.ApiHandler.ProtectedRouteHandler)
 	})

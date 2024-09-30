@@ -11,6 +11,9 @@ type Store interface {
 	CreateUser(user types.User) error
 	GetUser(username string) (types.User, error)
 	DoesUserExist(username string) (bool, error)
+	GetProducts(productsRequest types.ProductsRequest) ([]types.Product, error)
+	GetProduct(id int) (types.Product, error)
+	InsertProduct(product types.InsertProductRequest) error
 }
 
 // SQLDatabase implictly implements UserStore
@@ -83,7 +86,7 @@ func (db SQLDatabase) CreateUser(user types.User) error {
 	return nil
 }
 
-func (db SQLDatabase) InsertProduct(product types.Product) error {
+func (db SQLDatabase) InsertProduct(product types.InsertProductRequest) error {
 	// insert a new product into the database
 	_, err := db.databaseStore.Exec("INSERT INTO products (name, price) VALUES (?, ?)", product.Name, product.Price)
 
@@ -94,11 +97,11 @@ func (db SQLDatabase) InsertProduct(product types.Product) error {
 	return nil
 }
 
-func (db SQLDatabase) GetProducts(offset, limit int) ([]types.Product, error) {
+func (db SQLDatabase) GetProducts(productsRequest types.ProductsRequest) ([]types.Product, error) {
 	var products []types.Product
 
 	// get the limit and offset numbers from the request query parameters
-	rows, err := db.databaseStore.Query("SELECT * FROM products LIMIT ? OFFSET ?", limit, offset)
+	rows, err := db.databaseStore.Query("SELECT * FROM products LIMIT ? OFFSET ?", productsRequest.Limit, productsRequest.Offset)
 
 	if err != nil {
 		return products, err
