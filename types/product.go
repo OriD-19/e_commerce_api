@@ -1,9 +1,10 @@
 package types
 
 type Product struct {
-	ID    int     `json:"id,omitempty"`
-	Name  string  `json:"name,omitempty"`
-	Price float32 `json:"price,omitempty"`
+	ID        int     `json:"id,omitempty"`
+	Name      string  `json:"name,omitempty"`
+	Price     float32 `json:"price,omitempty"`
+	CreatedBy int     `json:"created_by,omitempty"`
 }
 
 type InsertProductRequest struct {

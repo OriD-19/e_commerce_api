@@ -96,7 +96,16 @@ func (api ApiHandler) InsertProductHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = api.dbStore.InsertProduct(product)
+	var contextUser types.ContextUser = "user_id"
+	userId := r.Context().Value(contextUser)
+	fmt.Printf("Type of user id: %T\n", userId)
+
+	// if !ok {
+	// 	http.Error(w, "user not found in the token", http.StatusUnauthorized)
+	// 	return
+	// }
+
+	err = api.dbStore.InsertProduct(product, int(userId.(float64)))
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

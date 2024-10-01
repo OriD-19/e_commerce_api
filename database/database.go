@@ -13,7 +13,7 @@ type Store interface {
 	DoesUserExist(username string) (bool, error)
 	GetProducts(productsRequest types.ProductsRequest) ([]types.Product, error)
 	GetProduct(id int) (types.Product, error)
-	InsertProduct(product types.InsertProductRequest) error
+	InsertProduct(product types.InsertProductRequest, userId int) error
 }
 
 // SQLDatabase implictly implements UserStore
@@ -22,6 +22,10 @@ type SQLDatabase struct {
 }
 
 func setupDB(db *sql.DB) error {
+
+	// db.Exec(`DROP TABLE IF EXISTS users;`)
+	// db.Exec(`DROP TABLE IF EXISTS products;`)
+
 	db.Exec(`CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		username TEXT NOT NULL,
@@ -31,7 +35,10 @@ func setupDB(db *sql.DB) error {
 	db.Exec(`CREATE TABLE IF NOT EXISTS products (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT NOT NULL,
-		price REAL NOT NULL
+		price REAL NOT NULL,
+		user_id INTEGER NOT NULL,
+
+		FOREIGN KEY (user_id) REFERENCES users(id)
 		);`)
 
 	return nil
@@ -86,9 +93,9 @@ func (db SQLDatabase) CreateUser(user types.User) error {
 	return nil
 }
 
-func (db SQLDatabase) InsertProduct(product types.InsertProductRequest) error {
+func (db SQLDatabase) InsertProduct(product types.InsertProductRequest, userId int) error {
 	// insert a new product into the database
-	_, err := db.databaseStore.Exec("INSERT INTO products (name, price) VALUES (?, ?)", product.Name, product.Price)
+	_, err := db.databaseStore.Exec("INSERT INTO products (name, price, user_id) VALUES (?, ?, ?)", product.Name, product.Price, userId)
 
 	if err != nil {
 		return err
@@ -109,7 +116,7 @@ func (db SQLDatabase) GetProducts(productsRequest types.ProductsRequest) ([]type
 
 	for rows.Next() {
 		var product types.Product
-		err = rows.Scan(&product.ID, &product.Name, &product.Price)
+		err = rows.Scan(&product.ID, &product.Name, &product.Price, &product.CreatedBy)
 
 		if err != nil {
 			return products, err

@@ -19,6 +19,8 @@ type RequestUser struct {
 	Password string `json:"password"`
 }
 
+type ContextUser string
+
 func NewUser(ru RequestUser) (User, error) {
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(ru.Password), bcrypt.DefaultCost)
 
@@ -44,7 +46,7 @@ func CreateToken(user User) string {
 	validUntil := now.Add(time.Hour * 24).Unix()
 
 	claims := jwt.MapClaims{
-		"user":    user.Username,
+		"user_id": user.ID,
 		"expires": validUntil,
 	}
 
